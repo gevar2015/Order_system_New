@@ -47,19 +47,20 @@ def view_orders():
         tree.insert("", tk.END, values=row)
     conn.close()
 
-# Завершение заказа
-def complete_order():
+# Изменение статуса заказа
+def change_status():
     selected_item = tree.selection()
     if selected_item:
         order_id = tree.item(selected_item, 'values')[0]
+        new_status = status_entry.get()
         conn = sqlite3.connect('business_orders.db')
         cur = conn.cursor()
-        cur.execute("UPDATE orders SET status='Завершён' WHERE id=?", (order_id,))
+        cur.execute("UPDATE orders SET status=? WHERE id=?", (new_status, order_id))
         conn.commit()
         conn.close()
         view_orders()
     else:
-        messagebox.showwarning("Предупреждение", "Выберите заказ для завершения")
+        messagebox.showwarning("Предупреждение", "Выберите заказ для изменения статуса")
 
 # Анализ заказов (пример)
 def analyze_orders():
@@ -73,34 +74,41 @@ init_db()
 app = tk.Tk()
 app.title("Система управления заказами")
 
-# Поля ввода
-tk.Label(app, text="Имя клиента").pack()
-customer_name_entry = tk.Entry(app)
-customer_name_entry.pack()
+# Поля ввода в одну строку
+input_frame = tk.Frame(app)
+input_frame.pack()
 
-tk.Label(app, text="Артикул товара").pack()
-product_sku_entry = tk.Entry(app)
-product_sku_entry.pack()
+tk.Label(input_frame, text="Имя клиента").grid(row=0, column=0)
+customer_name_entry = tk.Entry(input_frame)
+customer_name_entry.grid(row=0, column=1)
 
-tk.Label(app, text="Наименование товара").pack()
-product_name_entry = tk.Entry(app)
-product_name_entry.pack()
+tk.Label(input_frame, text="Артикул товара").grid(row=0, column=2)
+product_sku_entry = tk.Entry(input_frame)
+product_sku_entry.grid(row=0, column=3)
 
-tk.Label(app, text="Количество единиц товара").pack()
-quantity_entry = tk.Entry(app)
-quantity_entry.pack()
+tk.Label(input_frame, text="Наименование товара").grid(row=0, column=4)
+product_name_entry = tk.Entry(input_frame)
+product_name_entry.grid(row=0, column=5)
 
-tk.Label(app, text="Дата заказа").pack()
-order_date_entry = tk.Entry(app)
-order_date_entry.pack()
+tk.Label(input_frame, text="Количество").grid(row=0, column=6)
+quantity_entry = tk.Entry(input_frame)
+quantity_entry.grid(row=0, column=7)
+
+tk.Label(input_frame, text="Дата заказа").grid(row=0, column=8)
+order_date_entry = tk.Entry(input_frame)
+order_date_entry.grid(row=0, column=9)
+
+tk.Label(input_frame, text="Статус").grid(row=0, column=10)
+status_entry = tk.Entry(input_frame)
+status_entry.grid(row=0, column=11)
 
 # Кнопка для добавления заказа
 add_button = tk.Button(app, text="Добавить заказ", command=add_order)
 add_button.pack()
 
-# Кнопка для завершения заказа
-complete_button = tk.Button(app, text="Завершить заказ", command=complete_order)
-complete_button.pack()
+# Кнопка для изменения статуса заказа
+status_button = tk.Button(app, text="Изменить статус", command=change_status)
+status_button.pack()
 
 # Кнопка для анализа заказов
 analyze_button = tk.Button(app, text="Анализ заказов", command=analyze_orders)
